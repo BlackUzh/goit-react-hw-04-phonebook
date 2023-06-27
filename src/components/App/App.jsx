@@ -8,24 +8,30 @@ import { Section } from 'components/Section/Section';
 import { Container } from './App.styled';
 
 export function App() {
-  const contactArray = [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ];
-  const storage = () => JSON.parse(window.localStorage.getItem('contacts'));
-  const [contacts, setContacts] = useState(storage ?? contactArray);
+  const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
 
-  const handleSubmit = contactItem => {
+  useEffect(() => {
+    const contactArray = [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ];
+
+    const storageData = JSON.parse(window.localStorage.getItem('contacts'));
+    const initialContacts = storageData !== null && storageData !== undefined ? storageData : contactArray;
+    setContacts(initialContacts);
+  }, []);
+
+  function handleSubmit(contactItem) {
     const { name } = contactItem;
     if (contacts.some(contact => contact.name === name)) {
       Notiflix.Report.warning('Warning', `${name} is already in contacts.`);
     } else {
       setContacts(prevState => [contactItem, ...prevState]);
     }
-  };
+  }
 
   const deleteContact = id => {
     setContacts(contacts => contacts.filter(contact => contact.id !== id));
@@ -47,6 +53,7 @@ export function App() {
   }, [contacts]);
 
   const visibleContacts = getFilterContact();
+
   return (
     <Container>
       <Section title={'Phonebook'}>
@@ -72,7 +79,6 @@ Notiflix.Report.init({
   messageFontSize: '20px',
   warning: {
     svgColor: '#44728f',
-
     buttonBackground: '#44728f',
     backOverlayColor: 'rgba(0,0, 0,0.2)',
   },
